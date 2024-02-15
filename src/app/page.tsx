@@ -56,7 +56,10 @@ export default function Home() {
       <div className="flex flex-col rounded-lg shadow-lg bg-gray-200 max-w-3xl w-full p-7 items-center gap-y-7">
         <div className="flex flex-col items-center">
           <h1 className="font-bold text-2xl">Upload New Video</h1>
-          <p>select a video to be uploaded to our storage</p>
+          <p className="text-center">
+            select a video to be uploaded to our storage. Maximum file size is
+            50mb
+          </p>
         </div>
         <div className="border h-0 border-gray-400 w-full"></div>
         {!file && (
