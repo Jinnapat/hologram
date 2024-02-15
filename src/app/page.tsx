@@ -45,7 +45,7 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center p-5">
+    <div className="flex flex-col rounded-lg shadow-lg bg-gray-200 max-w-3xl w-full p-7 items-center gap-y-7">
       <input
         type="file"
         hidden
@@ -53,51 +53,49 @@ export default function Home() {
         ref={inputRef}
         onChange={handleFileChange}
       />
-      <div className="flex flex-col rounded-lg shadow-lg bg-gray-200 max-w-3xl w-full p-7 items-center gap-y-7">
-        <div className="flex flex-col items-center">
-          <h1 className="font-bold text-2xl">Upload New Video</h1>
-          <p className="text-center">
-            select a video to be uploaded to our storage. Maximum file size is
-            50mb
-          </p>
-        </div>
-        <div className="border h-0 border-gray-400 w-full"></div>
-        {!file && (
-          <button
-            className="rounded-lg bg-red-500 hover:bg-red-600 p-5 w-48 transition-colors duration-300 h-48 flex flex-col items-center justify-center"
-            onClick={selectFile}
-          >
-            <Image
-              src="/video-chat.png"
-              width={100}
-              height={100}
-              alt="upload image"
-            />
-            <p className="text-white">select a video</p>
-          </button>
-        )}
-        {file && <video src={URL.createObjectURL(file)}></video>}
-        <div className="flex flex-row justify-evenly items-center gap-5">
-          <button
-            onClick={selectFile}
-            disabled={isProcessing}
-            className="bg-orange-500 rounded-lg shadow-md hover:bg-orange-600 p-3 text-white transition-colors duration-300 disabled:bg-gray-500 disabled:text-gray-200"
-          >
-            {file ? "Change video" : "Select video"}
-          </button>
-          <button
-            className="bg-green-500 rounded-lg shadow-md hover:bg-green-600 p-3 text-white transition-colors duration-300 disabled:bg-gray-500 disabled:text-gray-200 flex flex-row gap-2 justify-center items-center"
-            onClick={upload}
-            disabled={file == null || isProcessing}
-          >
-            {isProcessing && (
-              <FontAwesomeIcon className="animate-spin" icon={faSpinner} />
-            )}
-            Upload video
-          </button>
-        </div>
-        <p className="text-red-700">{errorMessage}</p>
+      <div className="flex flex-col items-center">
+        <h1 className="font-bold text-2xl">Upload New Video</h1>
+        <p className="text-center">
+          select a video to be uploaded to our storage. Maximum file size is
+          50mb
+        </p>
       </div>
+      <div className="border h-0 border-gray-400 w-full"></div>
+      {!file && (
+        <button
+          className="rounded-lg bg-red-500 hover:bg-red-600 p-5 w-48 transition-colors duration-300 h-48 flex flex-col items-center justify-center"
+          onClick={selectFile}
+        >
+          <Image
+            src="/video-chat.png"
+            width={100}
+            height={100}
+            alt="upload image"
+          />
+          <p className="text-white">select a video</p>
+        </button>
+      )}
+      {file && <video src={URL.createObjectURL(file)}></video>}
+      <div className="flex flex-row justify-evenly items-center gap-5">
+        <button
+          onClick={selectFile}
+          disabled={isProcessing}
+          className="bg-orange-500 rounded-lg shadow-md hover:bg-orange-600 p-3 text-white transition-colors duration-300 disabled:bg-gray-500 disabled:text-gray-200"
+        >
+          {file ? "Change video" : "Select video"}
+        </button>
+        <button
+          className="bg-green-500 rounded-lg shadow-md hover:bg-green-600 p-3 text-white transition-colors duration-300 disabled:bg-gray-500 disabled:text-gray-200 flex flex-row gap-2 justify-center items-center"
+          onClick={upload}
+          disabled={file == null || isProcessing}
+        >
+          {isProcessing && (
+            <FontAwesomeIcon className="animate-spin" icon={faSpinner} />
+          )}
+          Upload video
+        </button>
+      </div>
+      <p className="text-red-700">{errorMessage}</p>
       {showPopup && (
         <div className="bg-gray-100 rounded-2xl shadow-xl flex flex-col items-center p-8 absolute border-2 top-10 gap-6 w-80">
           <p className="font-bold text-2xl">Upload Successful</p>
