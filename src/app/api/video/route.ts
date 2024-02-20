@@ -36,9 +36,3 @@ export async function POST(request: NextRequest) {
   }
   return new NextResponse("ok");
 }
-
-export const config = {
-  api: {
-    responseLimit: "50mb",
-  },
-};
