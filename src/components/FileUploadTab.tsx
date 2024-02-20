@@ -26,7 +26,6 @@ export default function FileUploadTab() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showPopup, setShowPopup] = useState<boolean>(false);
 
-  console.log(firebaseConfig);
   const selectFile = () => {
     if (!inputRef.current) return;
     inputRef.current.click();
