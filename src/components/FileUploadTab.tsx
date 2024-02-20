@@ -4,6 +4,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { ChangeEventHandler, useRef, useState } from "react";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { initializeApp } from "firebase/app";
+import { getStorage, ref, uploadBytes, listAll } from "firebase/storage";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
 
 export default function FileUploadTab() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -12,6 +26,7 @@ export default function FileUploadTab() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [showPopup, setShowPopup] = useState<boolean>(false);
 
+  console.log(firebaseConfig);
   const selectFile = () => {
     if (!inputRef.current) return;
     inputRef.current.click();
@@ -27,19 +42,15 @@ export default function FileUploadTab() {
     setErrorMessage("");
     setIsProcessing(true);
     if (!file) return;
-    const formData = new FormData();
-    formData.append("name", file.name);
-    formData.append("video", file);
-    const uploadResult = await fetch("/api/video", {
-      method: "POST",
-      body: formData,
-    });
-    setIsProcessing(false);
-    console.log(uploadResult);
-    if (uploadResult.status != 200) {
-      setErrorMessage(await uploadResult.text());
+    const refName = `video/${file.name}`;
+    const videoRef = ref(storage, refName);
+    const uploadResult = await uploadBytes(videoRef, file);
+    if (!uploadResult) {
+      setErrorMessage("Cannot upload file");
+      setIsProcessing(false);
       return;
     }
+    setIsProcessing(false);
     setFile(null);
     setShowPopup(true);
   };
