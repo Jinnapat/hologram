@@ -32,9 +32,16 @@ export default function FileUploadTab() {
   };
 
   const handleFileChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setErrorMessage("");
     const fileList = e.currentTarget.files;
     if (!fileList) return;
-    setFile(fileList[0]);
+    const file = fileList[0];
+    if (file.size > parseInt(process.env.NEXT_PUBLIC_MAX_FILE_SIZE as string)) {
+      setFile(null);
+      setErrorMessage("Selected file is too big");
+      return;
+    }
+    setFile(file);
   };
 
   const upload = async () => {
