@@ -4,20 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { ChangeEventHandler, useRef, useState } from "react";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytes, listAll } from "firebase/storage";
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
-
-const app = initializeApp(firebaseConfig);
-const storage = getStorage(app);
+import { ref, uploadBytes } from "firebase/storage";
+import { storage } from "../../firebaseStorage";
 
 export default function FileUploadTab() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -84,7 +72,7 @@ export default function FileUploadTab() {
           <p className="text-white">select a video</p>
         </button>
       )}
-      {file && <video src={URL.createObjectURL(file)}></video>}
+      {file && <video src={URL.createObjectURL(file)} controls></video>}
       <div className="flex flex-row justify-evenly items-center gap-5">
         <button
           onClick={selectFile}
