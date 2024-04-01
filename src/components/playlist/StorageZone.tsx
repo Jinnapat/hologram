@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 import { ref, list, StorageReference, getDownloadURL } from "firebase/storage";
 import { storage } from "../../../firebaseStorage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Image from "next/image";
+import { AMQPWebSocketClient } from '@/lib/amqp-websocket-client.mjs';
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const VIDEO_REF = ref(storage, "video");
 const STORAGE_PAGE_SIZE = 5;
@@ -42,6 +46,27 @@ export default function StorageZone() {
     setPreviewVideo(videoUrl);
   };
 
+  const addVideoToQueue = async (videoRef: StorageReference) => {
+    const videoUrl = await getDownloadURL(videoRef);
+    const amqp = new AMQPWebSocketClient(
+      process.env.NEXT_PUBLIC_RABBITMQ_URL,
+      process.env.NEXT_PUBLIC_RABBITMQ_VHOST,
+      process.env.NEXT_PUBLIC_RABBITMQ_USERNAME,
+      process.env.NEXT_PUBLIC_RABBITMQ_PASSWORD,
+    )
+    try {
+      const conn = await amqp.connect()
+      const ch = await conn.channel()
+      const q = await ch.queue("playlist")
+      await q.bind("amq.fanout")
+      const res = await ch.basicPublish("amq.fanout", "", videoUrl, { contentType: "text/plain" })
+      toast("Added a video to playlist")
+      conn.close()
+    } catch (err) {
+      toast("Error: cannot add new video to playlist")
+    }
+  }
+
   useEffect(() => {
     const load = async () => {
       const videoList = await list(VIDEO_REF, {
@@ -57,6 +82,7 @@ export default function StorageZone() {
   return (
     <>
       <div className="w-full flex flex-col gap-2">
+        <ToastContainer />
         <div className="flex flex-row justify-between items-end">
           <h2 className="font-bold mb-2">Storage</h2>
           <div className="w-full flex flex-row items-center gap-3 justify-end">
@@ -94,13 +120,18 @@ export default function StorageZone() {
             refList[currentStoragePage].length > 0 && (
               <>
                 {refList[currentStoragePage].map((ref) => (
-                  <button
+                  <div
                     key={ref.name}
-                    onClick={() => getVideoUrl(ref)}
-                    className="hover:bg-gray-300 transition-colors rounded-lg w-full p-2 text-left border border-gray-500"
+                    className="rounded-lg w-full p-2 text-left border border-gray-500 flex flex-row items-center gap-1"
                   >
-                    {ref.name}
-                  </button>
+                    <p className="w-full text-nowrap overflow-hidden mr-3">{ref.name}</p>
+                    <button className="cursor-pointer hover:bg-red-300 bg-red-400 rounded-full transition-colors p-1">
+                      <Image src="/file.png" onClick={() => getVideoUrl(ref)} alt="preview" width={30} height={30} />
+                    </button>
+                    <button onClick={() => addVideoToQueue(ref)} className="cursor-pointer hover:bg-blue-300 bg-blue-400 rounded-full transition-colors p-1">
+                      <Image src="/play.png" alt="play" width={30} height={30} />
+                    </button>
+                  </div>
                 ))}
               </>
             )}
